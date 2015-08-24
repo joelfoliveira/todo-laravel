@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/app/Todo.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bootstrap/app.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/public/assets/css/style.css" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/public/assets/js/todo.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/resources/views/ajaxData.blade.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/resources/views/index.blade.php" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

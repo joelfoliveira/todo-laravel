@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: todolist
+        psr4_prefix: todolist
+        src_path: app
