@@ -29,38 +29,31 @@ class TodoController extends BaseController
      */
     public function postTodo()
     {
+        $success = false;
+        $message = '';
+        $details = array();
+
         $validator = Validator::make(Input::all(), array('title' => 'required'));
 
         if(!$validator->fails())
         {
-            echo "Passou";
+            $todo = new Todo();
+            $todo->title = Input::get("title");
+            if($todo->save())
+            {
+                $success = true;
+            }
         }
         else
         {
-            echo "Falhou";
+
         }
 
-        //        $valid = true;
-        //
-        //        $success = false;
-        //        $message = '';
-        //        $details = array();
-        //
-        //        if($valid)
-        //        {
-        //            $todo = new Todo();
-        //            $todo->title = Input::get("title");
-        //            if($todo->save())
-        //            {
-        //                $success = true;
-        //            }
-        //        }
-        //
-        //        return response()->json([
-        //            'success' => $success,
-        //            'message' => $message,
-        //            'details' => $details
-        //        ]);
+        return response()->json([
+            'success' => $success,
+            'message' => $message,
+            'details' => $details
+        ]);
     }
 
     /**
