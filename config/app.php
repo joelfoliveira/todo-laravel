@@ -120,6 +120,8 @@ return [
          */
         todolist\Providers\AppServiceProvider::class, todolist\Providers\EventServiceProvider::class, todolist\Providers\RouteServiceProvider::class,
 
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+
     ],
 
     /*

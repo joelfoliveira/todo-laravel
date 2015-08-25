@@ -14,7 +14,6 @@ class TodoController extends BaseController
     public $restful = true;
 
     /**
-     *
      * @return mixed
      */
     public function getIndex()
@@ -25,13 +24,14 @@ class TodoController extends BaseController
 
     /**
      * Create To-Do
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
     public function postTodo()
     {
         $success = false;
         $message = '';
-        $details = array();
+        $errors = array();
+        $httpCode = 200;
 
         $validator = Validator::make(Input::all(), array('title' => 'required'));
 
@@ -42,24 +42,23 @@ class TodoController extends BaseController
             if($todo->save())
             {
                 $success = true;
+                $message = "Record inserted";
             }
         }
         else
         {
-
+            $errors = $validator->messages();
+            $message = $validator->messages()->first();
+            $httpCode = 422;
         }
 
-        return response()->json([
-            'success' => $success,
-            'message' => $message,
-            'details' => $details
-        ]);
+        return response()->json(['success' => $success, 'message' => $message, 'errors' => $errors], $httpCode);
     }
 
     /**
      * Update To-Do
      * @param $id
-     * @return string
+     * @return \Illuminate\Http\JsonResponse
      */
     public function putTodo($id)
     {
@@ -75,14 +74,38 @@ class TodoController extends BaseController
     /**
      * Delete To-Do
      * @param $id
-     * @return string
+     * @return \Illuminate\Http\JsonResponse
      */
     public function deleteTodo($id)
     {
-        $todo = Todo::whereId($id)->first();
-        $todo->delete();
-        return "OK";
+        $success = false;
+        $message = '';
+        $errors = array();
+        $httpCode = 200;
 
-        return response()->json(['success' => true, 'message' => '', 'details' => array()]);
+        $validator = Validator::make(array('id' => $id), array('id' => 'exists:todos,id'));
+
+        if(!$validator->fails())
+        {
+            $todo = Todo::whereId($id)->first();
+            if($todo && $todo->delete())
+            {
+                $success = true;
+                $message = "Record deleted";
+            }
+            else
+            {
+                $message = "Error occurred";
+                $httpCode = 500;
+            }
+        }
+        else
+        {
+            $errors = $validator->messages();
+            $message = $validator->messages()->first();
+            $httpCode = 422;
+        }
+
+        return response()->json(['success' => $success, 'message' => $message, 'errors' => $errors], $httpCode);
     }
 }

@@ -11,22 +11,22 @@
     <section id="todo-controls">
         <ul>
             <li>
-                <button class="bt add" onclick="Todo.showForm();">add</button>
+                <button class="bt add">add</button>
             </li>
         </ul>
         <ul>
             @foreach($todos as $todo)
-                <li id="todo-item-{{$todo->id}}" data-id="{{$todo->id}}">
+                <li id="todo-item-{{$todo->id}}" class="todo-item" data-id="{{$todo->id}}">
                     <a href="#"></a>
                     <span class="title">{{$todo->title}}</span>
-                    <button class="bt delete" onclick="Todo.deleteClick(this); return false;">Delete</button>
+                    <button class="bt delete">Delete</button>
                     <a href="#" class="icon-edit">Edit</a>
                 </li>
             @endforeach
         </ul>
     </section>
     <section id="todo-form" style="display:none">
-        <form>
+        <form onsubmit="return false;">
             <input class="title" type="text" name="title" placeholder="Enter a task name" value=""/>
             <button class="bt submit" onclick="Todo.submitFormClick(); return false;">Submit</button>
         </form>
