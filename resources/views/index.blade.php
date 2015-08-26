@@ -14,22 +14,25 @@
                 <button class="bt add">add</button>
             </li>
         </ul>
-        <ul>
-            @foreach($todos as $todo)
-                <li id="todo-item-{{$todo->id}}" class="todo-item" data-id="{{$todo->id}}">
-                    <a href="#"></a>
-                    <span class="title">{{$todo->title}}</span>
-                    <button class="bt delete">Delete</button>
-                    <a href="#" class="icon-edit">Edit</a>
-                </li>
-            @endforeach
-        </ul>
     </section>
     <section id="todo-form" style="display:none">
         <form onsubmit="return false;">
-            <input class="title" type="text" name="title" placeholder="Enter a task name" value=""/>
-            <button class="bt submit" onclick="Todo.submitFormClick(); return false;">Submit</button>
+            <input class="title" type="text" placeholder="Enter a task name" value=""/>
+            <button class="bt submit">Submit</button>
         </form>
+    </section>
+    <section id="todo-list">
+        <ul>
+            @foreach($todos as $todo)
+                <li id="todo-item-{{$todo->id}}" class="todo-item" data-id="{{$todo->id}}">
+                    <input type="checkbox"/>
+                    <input class="title" type="text" value="{{$todo->title}}" readonly/>
+                    <button class="bt edit">Edit</button>
+                    <button class="bt save" style="display: none;">Save</button>
+                    <button class="bt delete">Delete</button>
+                </li>
+            @endforeach
+        </ul>
     </section>
 </div>
 <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>

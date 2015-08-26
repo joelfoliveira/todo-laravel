@@ -62,13 +62,48 @@ class TodoController extends BaseController
      */
     public function putTodo($id)
     {
-        if(Request::ajax())
+        $success = false;
+        $message = '';
+        $errors = array();
+        $httpCode = 200;
+
+        $validator = Validator::make(array('id' => $id, 'title' => Input::get('title')), array('id' => 'exists:todos,id', 'title' => 'required'));
+
+        if(!$validator->fails())
         {
-            $task = Todo::find($id);
-            $task->status = 1;
-            $task->save();
-            return "OK";
+            $todo = Todo::whereId($id)->first();
+            if($todo)
+            {
+                if(Input::has('title'))
+                {
+                    $todo->title = Input::get('title');
+                }
+
+                if(Input::has('status'))
+                {
+                    $todo->status = Input::get('status');
+                }
+
+                if($todo->save())
+                {
+                    $success = true;
+                    $message = "Record updated";
+                }
+            }
+            else
+            {
+                $message = "Error occurred";
+                $httpCode = 500;
+            }
         }
+        else
+        {
+            $errors = $validator->messages();
+            $message = "Some fields are invalid";
+            $httpCode = 422;
+        }
+
+        return response()->json(['success' => $success, 'message' => $message, 'errors' => $errors], $httpCode);
     }
 
     /**

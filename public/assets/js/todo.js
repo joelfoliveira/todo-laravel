@@ -49,9 +49,19 @@ Todo.update = function(id, data, callback)
         url: 'todo/' + id,
         data: data,
         type: 'PUT',
-        success: function(result)
+        complete: function(result, status)
         {
-
+            if(typeof callback === "function")
+            {
+                if(status == 'success')
+                {
+                    callback(result.responseJSON.success, result.responseJSON);
+                }
+                else
+                {
+                    callback(false, null);
+                }
+            }
         }
     });
 };
@@ -102,6 +112,38 @@ Todo.setEvents = function()
         });
     });
 
+    $('.todo-item .edit').off('click').on('click', function()
+    {
+        var title = $(this).siblings(".title").val();
+        $(this).siblings(".title").data('title', title);
+
+        $(this).siblings(".title").attr("readonly", false);
+        $(this).siblings(".save").show();
+        $(this).hide();
+    });
+
+    $('.todo-item .save').off('click').on('click', function()
+    {
+        var elem = $(this);
+        var todoId = elem.parent().data('id');
+        var title = elem.siblings(".title").val();
+        if(todoId > 0)
+        {
+            Todo.update(todoId, {title: title}, function(success, result)
+            {
+                elem.siblings(".title").attr("readonly", true);
+                elem.hide();
+                elem.siblings(".edit").show();
+
+                if(success != true)
+                {
+                    var oldTitle = elem.siblings(".title").data('title');
+                    elem.siblings(".title").val(oldTitle);
+                }
+            });
+        }
+    });
+
     $('.todo-item .delete').off('click').on('click', function()
     {
         var itemElem = $(this).parent();
@@ -117,4 +159,14 @@ Todo.setEvents = function()
             });
         }
     });
+};
+
+Todo.showForm = function()
+{
+    $('#todo-form').show();
+};
+
+Todo.hideForm = function()
+{
+    $('#todo-form').hide();
 };
