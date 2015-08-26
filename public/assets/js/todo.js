@@ -8,14 +8,29 @@ Todo.init = function(callback)
     Todo.setEvents();
 }
 
-Todo.list = function(callback)
+Todo.list = function(dataType, callback)
 {
+    dataType = typeof dataType !== 'undefined' ? dataType : 'html';
+
     $.ajax({
         url: 'todo',
         type: 'GET',
-        success: function(result)
+        dataType: dataType,
+        complete: function(result, status)
         {
-
+            if(typeof callback === "function")
+            {
+                if(status == 'success')
+                {
+                    var resultStatus = dataType == 'html' ? true : result.responseJSON.success;
+                    var result = dataType == 'html' ? result.responseText : result.responseJSON;
+                    callback(resultStatus, result);
+                }
+                else
+                {
+                    callback(false, null);
+                }
+            }
         }
     });
 };
@@ -108,7 +123,14 @@ Todo.setEvents = function()
             title: title
         }, function(success, result)
         {
-
+            Todo.list('html', function(success, result)
+            {
+                if(success == true)
+                {
+                    Todo.hideForm();
+                    $('#todo-list').html(result);
+                }
+            });
         });
     });
 

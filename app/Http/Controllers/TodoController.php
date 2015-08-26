@@ -6,7 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
-use todolist\Http\Requests\Request;
+use Illuminate\Http\Request;
 use todolist\Todo;
 
 class TodoController extends BaseController
@@ -19,7 +19,25 @@ class TodoController extends BaseController
     public function getIndex()
     {
         $todos = Todo::all();
-        return View::make("index")->with("todos", $todos);
+        $todoListView = View::make("todoList")->with("todos", $todos);
+        return View::make("index")->with("todoListView", $todoListView);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTodo(Request $request)
+    {
+        $todos = Todo::all();
+
+        if($request->getRequestFormat('html') == 'html')
+        {
+            return View::make("todoList")->with("todos", $todos);
+        }
+        else
+        {
+            return response()->json(['success' => true, 'message' => '', 'errors' => array(), 'data' => $todos], 200);
+        }
     }
 
     /**
