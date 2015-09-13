@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
-use todolist\Todo;
+use todolist\Models\Todo;
 
 class TodoController extends BaseController
 {

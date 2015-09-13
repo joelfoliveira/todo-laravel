@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'model' => todolist\User::class,
+    'model' => todolist\Models\User::class,
 
     /*
     |--------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?php
 
-namespace todolist;
+namespace todolist\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
