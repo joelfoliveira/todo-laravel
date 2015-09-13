@@ -3,6 +3,7 @@
 namespace todolist\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -16,9 +17,9 @@ class TodoController extends BaseController
     /**
      * @return mixed
      */
-    public function getIndex()
+    public function showIndex()
     {
-        $todos = Todo::all();
+        $todos = Todo::where('done', 0)->orderBy('order', 'asc')->get();
         $todoListView = View::make("todoList")->with("todos", $todos);
         return View::make("index")->with("todoListView", $todoListView);
     }
@@ -26,9 +27,9 @@ class TodoController extends BaseController
     /**
      * @return mixed
      */
-    public function getTodo(Request $request)
+    public function getTodoList(Request $request)
     {
-        $todos = Todo::all();
+        $todos = Todo::where('done', 0)->orderBy('order', 'asc')->get();
 
         if($request->getRequestFormat('html') == 'html')
         {
@@ -44,7 +45,7 @@ class TodoController extends BaseController
      * Create To-Do
      * @return \Illuminate\Http\JsonResponse
      */
-    public function postTodo()
+    public function createTodo()
     {
         $success = false;
         $message = '';
@@ -78,14 +79,21 @@ class TodoController extends BaseController
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function putTodo($id)
+    public function updateTodo($id)
     {
         $success = false;
         $message = '';
         $errors = array();
         $httpCode = 200;
 
-        $validator = Validator::make(array('id' => $id, 'title' => Input::get('title')), array('id' => 'exists:todos,id', 'title' => 'required'));
+        $validator = Validator::make(array(
+            'id' => $id,
+            'title' => Input::get('title')
+        ), array(
+            'id' => 'exists:todos,id',
+            'title' => 'string',
+            'done' => 'boolean',
+        ));
 
         if(!$validator->fails())
         {
@@ -97,9 +105,9 @@ class TodoController extends BaseController
                     $todo->title = Input::get('title');
                 }
 
-                if(Input::has('status'))
+                if(Input::has('done'))
                 {
-                    $todo->status = Input::get('status');
+                    $todo->done = Input::get('done') ? 1 : 0;
                 }
 
                 if($todo->save())
@@ -118,6 +126,40 @@ class TodoController extends BaseController
         {
             $errors = $validator->messages();
             $message = "Some fields are invalid";
+            $httpCode = 422;
+        }
+
+        return response()->json(['success' => $success, 'message' => $message, 'errors' => $errors], $httpCode);
+    }
+
+    /**
+     * Update To-Do's order in bulk
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function orderTodoList()
+    {
+        $success = false;
+        $message = '';
+        $errors = array();
+        $httpCode = 200;
+
+        $validator = Validator::make(Input::all(), array('todos' => 'required|array'));
+
+        if(!$validator->fails())
+        {
+            $todos = Input::get('todos');
+            foreach($todos as $todo)
+            {
+                DB::table('todos')->where('id', $todo['id'])->update(array('order' => $todo['order']));
+            }
+
+            $success = true;
+            $message = "Records updated";
+        }
+        else
+        {
+            $errors = $validator->messages();
+            $message = "Invalid data";
             $httpCode = 422;
         }
 

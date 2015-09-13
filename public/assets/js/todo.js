@@ -1,7 +1,7 @@
 function Todo()
 {
 
-};
+}
 
 Todo.init = function(callback)
 {
@@ -63,7 +63,7 @@ Todo.update = function(id, data, callback)
     $.ajax({
         url: 'todo/' + id,
         data: data,
-        type: 'PUT',
+        type: 'POST',
         complete: function(result, status)
         {
             if(typeof callback === "function")
@@ -81,16 +81,35 @@ Todo.update = function(id, data, callback)
     });
 };
 
-Todo.setStatus = function(id, status, callback)
-{
-    Todo.update(id, {status: status});
-};
 
 Todo.delete = function(id, callback)
 {
     $.ajax({
         url: 'todo/' + id,
         type: 'DELETE',
+        complete: function(result, status)
+        {
+            if(typeof callback === "function")
+            {
+                if(status == 'success')
+                {
+                    callback(result.responseJSON.success, result.responseJSON);
+                }
+                else
+                {
+                    callback(false, null);
+                }
+            }
+        }
+    });
+};
+
+Todo.updateListOrder = function(data, callback)
+{
+    $.ajax({
+        url: 'todo/order',
+        type: 'POST',
+        data: {todos: data},
         complete: function(result, status)
         {
             if(typeof callback === "function")
@@ -128,10 +147,53 @@ Todo.setEvents = function()
                 if(success == true)
                 {
                     Todo.hideForm();
-                    $('#todo-list').html(result);
+                    $("#todo-form .title").val('');
+
+                    Todo.updateList(result);
                 }
             });
         });
+    });
+
+    $('.sortable').sortable({
+        handle: '.helper-sortable',
+        cancel: '',
+        stop: function(event, ui)
+        {
+            var itemsSorted = [];
+            var order = 1;
+            $(this).find('li').each(function()
+            {
+                itemsSorted.push({
+                    id: $(this).data('id'),
+                    order: order
+                });
+                order++;
+            });
+
+            if(itemsSorted.length > 0)
+            {
+                Todo.updateListOrder(itemsSorted);
+            }
+        }
+    });
+
+
+    $('.todo-item .switch.status').change('change', function()
+    {
+        var elem = $(this);
+        var todoId = elem.parent().data('id');
+        var checked = elem.is(":checked");
+        if(todoId > 0 && checked)
+        {
+            Todo.update(todoId, {done: true}, function(success, result)
+            {
+                if(success == true)
+                {
+                    elem.parent().remove();
+                }
+            });
+        }
     });
 
     $('.todo-item .edit').off('click').on('click', function()
@@ -168,6 +230,7 @@ Todo.setEvents = function()
 
     $('.todo-item .delete').off('click').on('click', function()
     {
+
         var itemElem = $(this).parent();
         var todoId = itemElem.data('id');
         if(todoId > 0)
@@ -191,4 +254,10 @@ Todo.showForm = function()
 Todo.hideForm = function()
 {
     $('#todo-form').hide();
+};
+
+Todo.updateList = function(content)
+{
+    $('#todo-list').html(content);
+    Todo.setEvents();
 };

@@ -1,15 +1,9 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-|
-*/
 
-
-Route::controller('/', 'TodoController');
+Route::get('/', ['uses' => 'TodoController@showIndex']);
+Route::get('/todo', ['uses' => 'TodoController@getTodoList']);
+Route::post('/todo', ['uses' => 'TodoController@createTodo']);
+Route::post('/todo/order', ['uses' => 'TodoController@orderTodoList']);
+Route::post('/todo/{id}', ['uses' => 'TodoController@updateTodo']);
+Route::delete('/todo/{id}', ['uses' => 'TodoController@deleteTodo']);
